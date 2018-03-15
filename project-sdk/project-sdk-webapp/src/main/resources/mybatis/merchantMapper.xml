@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.sdk.mapper.merchant.MerchantMapper">
+    <resultMap id="BaseResultMap" type="com.project.sdk.dto.merchant.Merchant">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="tel" property="tel" jdbcType="VARCHAR" />
+        <result column="address_desc" property="addressDesc" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+        <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+        <result column="imgURL" property="imgurl" jdbcType="VARCHAR" />
+        <result column="distance" property="distance" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="notice" property="notice" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        merchant.id,merchant.notice, merchant.name,merchant.user_id, merchant.email, merchant.tel, merchant.address_desc, merchant.status, merchant.create_time, merchant.create_user,
+        merchant.update_time, merchant.update_user, merchant.longitude, merchant.latitude, merchant.imgURL
+    </sql>
+    <sql id="MySqlPaginationSuffix">
+        <if test="page != null" >
+        limit #{page.pageOffset} , #{page.rows}
+        </if>
+    </sql>
+    <sql id="count_Tail">
+        select count(1) from
+    </sql>
+    <select id="queryList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        zm_merchant merchant
+        <include refid="where_fragement"/>
+
+    </select>
+    <sql id="where_fragement">
+        where 1=1
+        <if test="record != null">
+            <if test="record.userId != null" >
+                <![CDATA[ and merchant.user_id = #{record.userId} ]]>
+            </if>
+            <if test="record.id != null" >
+                <![CDATA[ and merchant.id = #{record.id} ]]>
+            </if>
+            <if test="record.name != null" >
+                <![CDATA[ and merchant.name like CONCAT('%',#{record.name},'%') ]]>
+            </if>
+            <if test="record.email != null" >
+               <![CDATA[ and merchant.email = #{record.email} ]]>
+            </if>
+            <if test="record.tel != null" >
+                <![CDATA[ and merchant.tel = #{record.tel} ]]>
+            </if>
+            <if test="record.addressDesc != null" >
+                <![CDATA[ and merchant.address_desc = #{record.addressDesc} ]]>
+            </if>
+            <if test="record.status != null" >
+                <![CDATA[ and merchant.status = #{record.status} ]]>
+            </if>
+            <if test="record.createTime != null" >
+                <![CDATA[ and merchant.create_time = #{record.createTime} ]]>
+            </if>
+            <if test="record.createUser != null" >
+                <![CDATA[ and merchant.create_user = #{record.createUser} ]]>
+            </if>
+            <if test="record.updateTime != null" >
+                <![CDATA[ and merchant.update_time = #{record.updateTime} ]]>
+            </if>
+            <if test="record.updateUser != null" >
+                <![CDATA[ and merchant.update_user = #{record.updateUser} ]]>
+            </if>
+            <if test="record.imgurl != null" >
+                <![CDATA[ and merchant.imgURL = #{record.imgurl} ]]>
+            </if>
+            <if test="record.ids != null">
+                and merchant.id in
+                <foreach collection="record.ids" item="item" open="("
+                         close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+    </sql>
+    <!-- 分页查询 -->
+    <select id="findPageList" resultMap="BaseResultMap">
+        SELECT
+        merchant.id,
+        merchant.name,
+        merchant.email,
+        merchant.tel,
+        merchant.address_desc,
+        merchant.status,
+        merchant.create_time,
+        merchant.create_user,
+        merchant.update_time,
+        merchant.update_user,
+        merchant.longitude,
+        merchant.latitude,
+        merchant.notice,
+        merchant.imgURL,
+        merchant.user_id,
+        ROUND(
+        6378.138 * 2 * ASIN(
+        SQRT(
+        POW(
+        SIN(
+        (
+        #{record.latitude} * PI() / 180 - latitude * PI() / 180
+        ) / 2
+        ),
+        2
+        ) + COS(#{record.latitude} * PI() / 180) * COS(latitude * PI() / 180) * POW(
+        SIN(
+        (
+        #{record.longitude} * PI() / 180 - longitude * PI() / 180
+        ) / 2
+        ),
+        2
+        )
+        )
+        ) * 1000
+        ) as distance,
+        count(zm_order.id) as sales_num
+        FROM
+        zm_merchant merchant left join zm_order zm_order on merchant.id=zm_order.merchantId
+        <include refid="where_fragement"/>
+        GROUP  BY merchant.id
+        <if test="record.orderBy==0">
+            order by distance,sales_num
+        </if>
+        <if test="record.orderBy==2">
+            order by sales_num desc
+        </if>
+        <if test="record.orderBy==1">
+            order by distance asc
+        </if>
+        <if test="page!=null">
+            <include refid="MySqlPaginationSuffix"/>
+        </if>
+    </select>
+    <!-- 条件查询 -->
+    <select id="queryMerchantList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        zm_merchant merchant
+        <include refid="where_fragement"/>
+    </select>
+    <!-- 查询条数 -->
+    <select id="queryCount" resultType="java.lang.Integer" parameterType="com.project.sdk.dto.merchant.Merchant">
+        <include refid="count_Tail"/>
+        zm_merchant merchant
+        <include refid="where_fragement"/>
+    </select>
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from zm_merchant merchant
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!-- 保存操作  -->
+    <insert id="insertSelective" parameterType="com.project.sdk.dto.merchant.Merchant" >
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into zm_merchant
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="notice != null" >
+                notice,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="email != null" >
+                email,
+            </if>
+            <if test="tel != null" >
+                tel,
+            </if>
+            <if test="addressDesc != null" >
+                address_desc,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="createUser != null" >
+                create_user,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+            <if test="updateUser != null" >
+                update_user,
+            </if>
+            <if test="longitude != null" >
+                longitude,
+            </if>
+            <if test="latitude != null" >
+                latitude,
+            </if>
+            <if test="imgurl != null" >
+                imgURL,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="notice != null" >
+                #{notice,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null" >
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null" >
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="addressDesc != null" >
+                #{addressDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="salesNum != null" >
+                #{salesNum,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="longitude != null" >
+                #{longitude,jdbcType=VARCHAR},
+            </if>
+            <if test="latitude != null" >
+                #{latitude,jdbcType=VARCHAR},
+            </if>
+            <if test="imgurl != null" >
+                #{imgurl,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <!-- 根据主键修改信息 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.project.sdk.dto.merchant.Merchant" >
+        update zm_merchant
+        <set >
+            <if test="notice != null" >
+                notice = #{notice,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null" >
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null" >
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="addressDesc != null" >
+                address_desc = #{addressDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null" >
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="longitude != null" >
+                longitude = #{longitude,jdbcType=VARCHAR},
+            </if>
+            <if test="latitude != null" >
+                latitude = #{latitude,jdbcType=VARCHAR},
+            </if>
+            <if test="imgurl != null" >
+                imgURL = #{imgurl,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

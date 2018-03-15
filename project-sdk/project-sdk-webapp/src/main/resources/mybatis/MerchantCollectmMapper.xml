@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.sdk.mapper.merchant.MerchantCollectMapper">
+    <resultMap id="BaseResultMap" type="com.project.sdk.dto.merchant.MerchantCollect" >
+        <id column="id" property="id"  />
+        <result column="user_id" property="userId"  />
+        <result column="collect_id" property="collectId"  />
+        <result column="create_time" property="createTime"  />
+        <result column="update_time" property="updateTime"  />
+        <result column="status" property="status"  />
+    </resultMap>
+
+
+    <sql id="selectAllColumns">
+        <![CDATA[
+		select
+ 			collect_.id
+ 			,collect_.user_id
+ 			,collect_.collect_id
+ 			,collect_.create_time
+ 			,collect_.update_time
+ 			,collect_.status
+		FROM
+		zm_merchant_collect collect_
+        ]]>
+    </sql>
+
+    <sql id="where_fragement">
+        where collect_.status = '1'
+        <if test="entity!=null">
+            <if test="entity.id != null  ">
+                <![CDATA[ and collect_.id  = #{entity.id} ]]>
+            </if>
+            <if test="entity.status != null  ">
+                <![CDATA[ and collect_.status  = #{entity.status} ]]>
+            </if>
+            <if test="entity.collectId != null  ">
+                <![CDATA[ and collect_.collect_id  = #{entity.collectId} ]]>
+            </if>
+            <if test="entity.userId != null  ">
+                <![CDATA[ and collect_.user_id  = #{entity.userId} ]]>
+            </if>
+            <if test="entity.createTime != null  ">
+                <![CDATA[ and collect_.create_time  = #{entity.createTime} ]]>
+            </if>
+            <if test="entity.updateTime != null  ">
+                <![CDATA[ and collect_.update_time  = #{entity.updateTime} ]]>
+            </if>
+        </if>
+    </sql>
+
+    <select id="findMerchantCollects" resultMap="BaseResultMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+    </select>
+
+
+    <insert id="addMerchantCollect" parameterType="com.project.sdk.dto.merchant.MerchantCollect" >
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into zm_merchant_collect (user_id,collect_id, create_time,update_time,status)
+        values (#{userId}, #{collectId}, #{createTime}, #{updateTime}, #{status})
+    </insert>
+
+    <update id="deleteMerchantCollect" parameterType="com.project.sdk.dto.merchant.MerchantCollect" >
+        update zm_merchant_collect
+        <set >
+            <if test="entity.status != null" >
+                status = #{entity.status},
+            </if>
+            <if test="entity.updateTime != null" >
+                update_time = #{entity.updateTime},
+            </if>
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
+</mapper>

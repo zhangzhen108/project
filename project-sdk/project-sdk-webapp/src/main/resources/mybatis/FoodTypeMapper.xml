@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.project.sdk.mapper.food.FoodTypeMapper" >
+    <resultMap id="BaseResultMap" type="com.project.sdk.dto.food.FoodType" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+    foodType.code ,foodType.name,foodType.id
+    </sql>
+    <select id="queryList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from zm_food_type foodType
+        where 1=1
+        <if test="merchantid!=null and merchantid!=''">
+            and foodType.merchantid=#{merchantid}
+        </if>
+        <if test="code!=null and code!=''">
+            and foodType.code=#{code}
+        </if>
+    </select>
+   <insert id="insert">
+INSERT INTO `zm_food_type` (`code`, `name`, `merchantId`) VALUES ( #{code}, #{name}, #{merchantId})
+   </insert>
+    <delete id="delete">
+        delete from zm_food_type
+        where id=#{id}
+    </delete>
+</mapper>

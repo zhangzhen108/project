@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.sdk.mapper.log.InterfaceLogMapper">
+    <resultMap id="BaseResultMap" type="com.project.sdk.dto.log.InterfaceLogDto" >
+        <id column="id" property="id"  />
+        <result column="interface_code" property="interfaceCode"  />
+        <result column="interface_name" property="interfaceName"  />
+        <result column="interface_req_json" property="interfaceReqJson"  />
+        <result column="interface_res_json" property="interfaceResJson"  />
+        <result column="create_time" property="createTime"  />
+        <result column="create_user" property="createUser"  />
+        <result column="update_time" property="updateTime"  />
+    </resultMap>
+
+    <sql id="pagination_tail">
+        limit #{page.pageOffset} , #{page.rows}
+    </sql>
+
+    <sql id="count_Tail">
+        select count(1) from
+    </sql>
+
+    <sql id="selectAllColumns">
+        <![CDATA[
+		select
+ 			inlog_.id
+ 			,inlog_.interface_code
+ 			,inlog_.interface_name
+ 			,inlog_.interface_req_json
+ 			,inlog_.interface_res_json
+ 			,inlog_.create_user
+ 			,inlog_.create_time
+ 			,inlog_.update_time
+		FROM
+		zm_interface_log inlog_
+        ]]>
+    </sql>
+
+    <sql id="where_fragement">
+        where 1=1
+        <if test="entity!=null">
+            <if test="entity.id != null  ">
+                <![CDATA[ and inlog_.id  = #{entity.id} ]]>
+            </if>
+            <if test="entity.interfaceCode != null  ">
+                <![CDATA[ and inlog_.interface_code  = #{entity.interfaceCode} ]]>
+            </if>
+            <if test="entity.interfaceName != null  ">
+                <![CDATA[ and inlog_.interface_name  = #{entity.interfaceName} ]]>
+            </if>
+            <if test="entity.interfaceReqJson != null  ">
+                <![CDATA[ and inlog_.interface_req_json  = #{entity.interfaceReqJson} ]]>
+            </if>
+            <if test="entity.interfaceResJson != null  ">
+                <![CDATA[ and inlog_.interface_res_json  = #{entity.interfaceResJson} ]]>
+            </if>
+            <if test="entity.createTime != null  ">
+                <![CDATA[ and inlog_.create_time  = #{entity.createTime} ]]>
+            </if>
+            <if test="entity.updateTime != null  ">
+                <![CDATA[ and inlog_.update_time  = #{entity.updateTime} ]]>
+            </if>
+            <if test="entity.createUser != null  ">
+                <![CDATA[ and inlog_.create_user  = #{entity.createUser} ]]>
+            </if>
+        </if>
+        order by inlog_.create_time desc
+    </sql>
+
+    <select id="queryById" resultMap="BaseResultMap" parameterType="long">
+        <include refid="selectAllColumns"/>
+        <![CDATA[
+		where inlog_.id = #{id}
+		]]>
+    </select>
+    <select id="findInterfaceLogs" resultMap="BaseResultMap">
+        <include refid="selectAllColumns"/>
+        <include refid="where_fragement"/>
+        <if test="page!=null">
+            <include refid="pagination_tail"/>
+        </if>
+    </select>
+
+
+    <insert id="addInterfaceLog" parameterType="com.project.sdk.dto.log.InterfaceLogDto" >
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into zm_interface_log (interface_code, interface_name, interface_req_json,
+        interface_res_json, create_time, create_user,
+        update_time)
+        values (#{interfaceCode}, #{interfaceName}, #{interfaceReqJson},
+        #{interfaceResJson}, #{createTime}, #{createUser},
+        #{updateTime})
+    </insert>
+
+    <update id="updateInterfaceLog" parameterType="com.project.sdk.dto.log.InterfaceLogDto" >
+        update zm_interface_log
+        <set >
+            <if test="entity.interfaceCode != null" >
+                interface_code = #{entity.interfaceCode},
+            </if>
+            <if test="entity.interfaceName != null" >
+                interface_name = #{entity.interfaceName},
+            </if>
+            <if test="entity.interfaceReqJson != null" >
+                interface_req_json = #{entity.interfaceReqJson},
+            </if>
+            <if test="entity.interfaceResJson != null" >
+                interface_res_json = #{entity.interfaceResJson},
+            </if>
+            <if test="entity.updateTime != null" >
+                update_time = #{entity.updateTime},
+            </if>
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
+    <select id="queryCount" resultType="Integer" parameterType="com.project.sdk.dto.log.InterfaceLogDto">
+        <include refid="count_Tail"/>
+        zm_interface_log inlog_
+        <include refid="where_fragement"/>
+    </select>
+
+</mapper>
