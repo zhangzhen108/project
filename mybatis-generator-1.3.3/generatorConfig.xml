@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+    <!-- <classPathEntry
+        location="C:\Users\zengjk\.m2\repository\mysql\mysql-connector-java\5.1.35\mysql-connector-java-5.1.35.jar" /> -->
+
+        <!-- <table schema="oms-dsp" tableName="mdm_addr_poi">
+        	特殊列类型定义
+        	<columnOverride column="ACTIVE_FLAG" javaType="Boolean"></columnOverride>
+        </table> -->
+        <!-- <table schema="oms-dsp" tableName="dsp_business_log">
+        	<generatedKey column="DSP_BUSINESS_LOG_ID" sqlStatement="MySql" identity="true"/>
+        </table> -->
+
+    <context id="MySqlTables" targetRuntime="MyBatis3">
+    	<plugin type="com.mybatis.pagination.MySqlPaginationPlugin"></plugin>
+    	<plugin type="com.gillion.repair.LongValueRepairAnnotationPlugin"></plugin>
+    	<commentGenerator>
+    		<property name="suppressAllComments" value="true"/>
+    	</commentGenerator>
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+            connectionURL="jdbc:mysql://rm-uf6qh5t22foaq54g3o.mysql.rds.aliyuncs.com:3306/restaurant?useUnicode=true&amp;characterEncoding=UTF-8"
+            userId="root" password="ZHANGzhen521" />
+        <javaModelGenerator targetPackage="com.project.sdk.dto.order"
+            targetProject=".\src\main\java" />
+        <sqlMapGenerator targetPackage="com.project.sdk.mapper"
+            targetProject=".\src\main\resources" />
+        <javaClientGenerator targetPackage="com.project.sdk.mapper.order"
+            targetProject=".\src\main\java" type="XMLMAPPER" />
+        <table schema="Collect" tableName="zm_merchant_collect">
+        	<generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+<!--        <table schema="OrderDetail" tableName="zm_order_detail">
+        </table>
+        <table schema="Subscribe" tableName="tm_subscribe">
+        </table>-->
+    </context>
+
+    <!-- <context id="OracleTables" targetRuntime="MyBatis3">
+    	<plugin type="com.mybatis.pagination.OraclePaginationPlugin"></plugin>
+    	<commentGenerator>
+    		<property name="suppressAllComments" value="true"/>
+    	</commentGenerator>
+        <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+            connectionURL="jdbc:oracle:thin:@10.135.13.22:1521:vom"
+            userId="vom" password="XhRAxG" />
+        <javaModelGenerator targetPackage="com.haier.rrs.computingTime.model"
+            targetProject=".\src\main\java" />
+        <sqlMapGenerator targetPackage="mybatis.mappers.computingTime"
+            targetProject=".\src\main\resources" />
+        <javaClientGenerator targetPackage="com.haier.rrs.computingTime.mapper"
+            targetProject=".\src\main\java" type="XMLMAPPER" />
+        <table schema="vom" tableName="ODS_BUSINESS_LOG">
+        </table>
+    </context> -->
+
+</generatorConfiguration>

@@ -11,6 +11,8 @@
     <modules>
         <module>project-sdk</module>
         <module>project-web</module>
+        <module>dreamCommon</module>
+        <module>FastDFS_Client-master</module>
     </modules>
 
     <parent>
